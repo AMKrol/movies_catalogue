@@ -33,3 +33,20 @@ def get_single_movie(movie_id):
     }
     response = requests.get(endpoint, headers=headers)
     return response.json()
+
+
+def get_single_movie_cast(movie_id):
+    endpoint = f"https://api.themoviedb.org/3/movie/{movie_id}/credits"
+    with open("api_token.txt", "r") as tokenfile:
+        api_token = tokenfile.read()
+    headers = {
+        "Authorization": f"Bearer {api_token}"
+    }
+    response = requests.get(endpoint, headers=headers)
+    return response.json()
+
+
+def get_cast(movie_id, how_many):
+    data = get_single_movie_cast(movie_id)
+    random_data = data["cast"][:how_many]
+    return random_data

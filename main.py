@@ -20,8 +20,8 @@ def utility_processor():
 @app.route("/movie/<movie_id>")
 def movie_details(movie_id):
     details = tmdb_client.get_single_movie(movie_id)
-    print(details)
-    return render_template("movie_details.html", movie=details)
+    cast = tmdb_client.get_cast(movie_id, how_many=16)
+    return render_template("movie_details.html", movie=details, cast=cast)
 
 
 if __name__ == '__main__':
