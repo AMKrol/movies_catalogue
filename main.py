@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 import tmdb_client
+import random
 
 app = Flask(__name__)
 
@@ -21,7 +22,8 @@ def utility_processor():
 def movie_details(movie_id):
     details = tmdb_client.get_single_movie(movie_id)
     cast = tmdb_client.get_cast(movie_id, how_many=16)
-    return render_template("movie_details.html", movie=details, cast=cast)
+    backdrop = tmdb_client.get_random_backdrop(movie_id)
+    return render_template("movie_details.html", movie=details, cast=cast, backdrop=backdrop)
 
 
 if __name__ == '__main__':

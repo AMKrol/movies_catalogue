@@ -50,3 +50,19 @@ def get_cast(movie_id, how_many):
     data = get_single_movie_cast(movie_id)
     random_data = data["cast"][:how_many]
     return random_data
+
+
+def get_movie_images(movie_id):
+    endpoint = f"https://api.themoviedb.org/3/movie/{movie_id}/images"
+    with open("api_token.txt", "r") as tokenfile:
+        api_token = tokenfile.read()
+    headers = {
+        "Authorization": f"Bearer {api_token}"
+    }
+    response = requests.get(endpoint, headers=headers)
+    return response.json()
+
+
+def get_random_backdrop(movie_id):
+    movie_images = get_movie_images(movie_id)
+    return random.choice(movie_images['backdrops'])["file_path"]
