@@ -1,4 +1,5 @@
 import requests
+import random
 
 
 def get_popular_movies():
@@ -14,7 +15,9 @@ def get_popular_movies():
 
 def get_movies(how_many):
     data = get_popular_movies()
-    return data["results"][:how_many]
+    random_data = data["results"][:how_many]
+    random.shuffle(random_data)
+    return random_data
 
 
 def get_poster_url(poster_path, size="w342"):
