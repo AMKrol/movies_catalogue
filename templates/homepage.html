@@ -9,8 +9,13 @@
     </div>
     <div class="col-lg-12 mb-4">
         {% for type in list_types %}
+        {% if type == list_type%}
+        <a href="{{ url_for('homepage', list_type=type ) }}" class="btn btn-primary">{{
+            type.capitalize().replace('_', ' ') }}</a>
+        {% else %}
         <a href="{{ url_for('homepage', list_type=type ) }}" class="btn btn-outline-info">{{
             type.capitalize().replace('_', ' ') }}</a>
+        {% endif %}
         {% endfor %}
     </div>
     {% for movie in movies %}
