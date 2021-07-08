@@ -8,7 +8,9 @@ app = Flask(__name__)
 def homepage():
     list_type = request.args.get('list_type', "popular")
     movies = tmdb_client.get_movies(how_many=8, list_name=list_type)
-    return render_template("homepage.html", movies=movies, list_type=list_type)
+    list_types = ['popular', 'top_rated', 'upcoming', 'popular']
+    return render_template("homepage.html", movies=movies,
+                           list_type=list_type, list_types=list_types)
 
 
 @app.context_processor
