@@ -1,14 +1,14 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import tmdb_client
-import random
 
 app = Flask(__name__)
 
 
 @app.route('/')
 def homepage():
-    movies = tmdb_client.get_movies(how_many=12)
-    return render_template("homepage.html", movies=movies)
+    list_type = request.args.get('list_type', "popular")
+    movies = tmdb_client.get_movies(how_many=8, list_name=list_type)
+    return render_template("homepage.html", movies=movies, list_type=list_type)
 
 
 @app.context_processor
@@ -23,7 +23,8 @@ def movie_details(movie_id):
     details = tmdb_client.get_single_movie(movie_id)
     cast = tmdb_client.get_cast(movie_id, how_many=16)
     backdrop = tmdb_client.get_random_backdrop(movie_id)
-    return render_template("movie_details.html", movie=details, cast=cast, backdrop=backdrop)
+    return render_template("movie_details.html", movie=details,
+                           cast=cast, backdrop=backdrop)
 
 
 if __name__ == '__main__':

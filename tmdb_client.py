@@ -13,8 +13,20 @@ def get_popular_movies():
     return response.json()
 
 
-def get_movies(how_many):
-    data = get_popular_movies()
+def get_movies_list(list_name):
+    endpoint = f"https://api.themoviedb.org/3/movie/{list_name}"
+    with open("api_token.txt", "r") as tokenfile:
+        api_token = tokenfile.read()
+    headers = {
+        "Authorization": f"Bearer {api_token}"
+    }
+    response = requests.get(endpoint, headers=headers)
+    response.raise_for_status()
+    return response.json()
+
+
+def get_movies(list_name="popular", how_many=12):
+    data = get_movies_list(list_name)
     random_data = data["results"][:how_many]
     random.shuffle(random_data)
     return random_data
