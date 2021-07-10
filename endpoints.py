@@ -2,7 +2,7 @@ import requests
 import random
 
 
-class tmdb_service():
+class TmdbService():
     def __init__(self):
         self.endpoint_movie = "https://api.themoviedb.org/3/movie/"
         self.endpoint_poster = "http://image.tmdb.org/t/p/"
