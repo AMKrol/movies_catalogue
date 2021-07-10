@@ -1,9 +1,9 @@
 from flask import Flask, render_template, request
-from endpoints import tmdb_service
+from endpoints import TmdbService
 
 app = Flask(__name__)
 
-tmdb_client = tmdb_service()
+tmdb_client = TmdbService()
 
 
 @app.route('/')
