@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request
+from flask import redirect, url_for
 from endpoints import TmdbService
 
 app = Flask(__name__)
@@ -31,6 +32,15 @@ def movie_details(movie_id):
                            cast=tmdb_client.get_cast_endpoint(
                                movie_id, how_many=16),
                            backdrop=tmdb_client.get_random_backdrop_endpoint(movie_id))
+
+
+@app.route("/search")
+def search_movie():
+    query = request.args.get('q', "")
+    if query == "":
+        return redirect(url_for("homepage"))
+    movie_list = tmdb_client.search_movie(query)
+    return render_template("search.html", search_query=query, movies=movie_list)
 
 
 if __name__ == '__main__':

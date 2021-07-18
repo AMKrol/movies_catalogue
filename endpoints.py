@@ -6,6 +6,7 @@ class TmdbService():
     def __init__(self):
         self.endpoint_movie = "https://api.themoviedb.org/3/movie/"
         self.endpoint_poster = "http://image.tmdb.org/t/p/"
+        self.endpoint_search = "https://api.themoviedb.org/3/search/movie/"
         self.list_types = ['popular', 'top_rated', 'upcoming', 'now_playing']
 
     def get_movies_list_endpoint(self, list_name):
@@ -68,3 +69,16 @@ class TmdbService():
     def get_random_backdrop_endpoint(self, movie_id):
         movie_images = self.get_movie_images(movie_id)
         return random.choice(movie_images['backdrops'])["file_path"]
+
+    def get_movie_search_endpoint(self, query):
+        endpoint = f"{self.endpoint_search}?query={query}"
+        with open("api_token.txt", "r") as tokenfile:
+            api_token = tokenfile.read()
+        headers = {
+            "Authorization": f"Bearer {api_token}"
+        }
+        response = requests.get(endpoint, headers=headers)
+        return response.json()
+
+    def search_movie(self, query):
+        return self.get_movie_search_endpoint(query)["results"]
