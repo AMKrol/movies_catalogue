@@ -7,6 +7,7 @@ class TmdbService():
         self.endpoint_movie = "https://api.themoviedb.org/3/movie/"
         self.endpoint_poster = "http://image.tmdb.org/t/p/"
         self.endpoint_search = "https://api.themoviedb.org/3/search/movie/"
+        self.endpoint_get_tv_airing_today = "https://api.themoviedb.org/3/tv/airing_today"
         self.list_types = ['popular', 'top_rated', 'upcoming', 'now_playing']
 
     def get_movies_list_endpoint(self, list_name):
@@ -82,3 +83,16 @@ class TmdbService():
 
     def search_movie(self, query):
         return self.get_movie_search_endpoint(query)["results"]
+
+    def get_airing_today(self):
+        endpoint = f"{self.endpoint_get_tv_airing_today}"
+        with open("api_token.txt", "r") as tokenfile:
+            api_token = tokenfile.read()
+        headers = {
+            "Authorization": f"Bearer {api_token}"
+        }
+        response = requests.get(endpoint, headers=headers)
+        return response.json()
+
+    def airing_today(self):
+        return self.get_airing_today()["results"]

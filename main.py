@@ -43,5 +43,11 @@ def search_movie():
     return render_template("search.html", search_query=query, movies=movie_list)
 
 
+@app.route("/airing_today")
+def airing_today():
+    movie_list = tmdb_client.airing_today()
+    return render_template("airing.html", movies=movie_list)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
