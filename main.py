@@ -1,10 +1,13 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, flash
 from flask import redirect, url_for
 from endpoints import TmdbService
 
 app = Flask(__name__)
+app.secret_key = b'_5#y2L"asdasdfnJHsd^546\n\xec]/'
 
 tmdb_client = TmdbService()
+
+FAVORITES = set()
 
 
 @app.route('/')
@@ -47,6 +50,24 @@ def search_movie():
 def airing_today():
     movie_list = tmdb_client.airing_today()
     return render_template("airing.html", movies=movie_list)
+
+
+@app.route("/favorites/add", methods=['POST'])
+def add_to_favorites():
+    data = request.form
+    movie_id = data.get('movie_id')
+    movie_title = data.get('movie_title')
+    if movie_id:
+        FAVORITES.add(movie_id)
+    flash(f"Film {movie_title} dodany do Ulubionych")
+
+    return redirect(url_for('homepage'))
+
+
+@app.route("/favorites")
+def show_favorites():
+    movie_list = tmdb_client.favories_list(FAVORITES)
+    return render_template("favorites.html", movies=movie_list)
 
 
 if __name__ == '__main__':

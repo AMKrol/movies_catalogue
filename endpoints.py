@@ -96,3 +96,10 @@ class TmdbService():
 
     def airing_today(self):
         return self.get_airing_today()["results"]
+
+    def favories_list(self, list):
+        output = []
+        for movie in list:
+            output.append(self.get_single_movie_endpoint(movie))
+
+        return output
