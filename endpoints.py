@@ -10,13 +10,16 @@ class TmdbService():
         self.endpoint_get_tv_airing_today = "https://api.themoviedb.org/3/tv/airing_today"
         self.list_types = ['popular', 'top_rated', 'upcoming', 'now_playing']
 
-    def get_movies_list_endpoint(self, list_name):
-        endpoint = f"{self.endpoint_movie}{list_name}"
+    def _make_headers():
         with open("api_token.txt", "r") as tokenfile:
             api_token = tokenfile.read()
-        headers = {
+        return {
             "Authorization": f"Bearer {api_token}"
         }
+
+    def get_movies_list_endpoint(self, list_name):
+        endpoint = f"{self.endpoint_movie}{list_name}"
+        headers = self._make_headers()
         response = requests.get(endpoint, headers=headers)
         response.raise_for_status()
         return response.json()
@@ -34,21 +37,13 @@ class TmdbService():
 
     def get_single_movie_endpoint(self, movie_id):
         endpoint = f"{self.endpoint_movie}{movie_id}"
-        with open("api_token.txt", "r") as tokenfile:
-            api_token = tokenfile.read()
-        headers = {
-            "Authorization": f"Bearer {api_token}"
-        }
+        headers = self._make_headers()
         response = requests.get(endpoint, headers=headers)
         return response.json()
 
     def get_single_movie_cast_endpoint(self, movie_id):
         endpoint = f"{self.endpoint_movie}{movie_id}/credits"
-        with open("api_token.txt", "r") as tokenfile:
-            api_token = tokenfile.read()
-        headers = {
-            "Authorization": f"Bearer {api_token}"
-        }
+        headers = self._make_headers()
         response = requests.get(endpoint, headers=headers)
         return response.json()
 
@@ -59,11 +54,7 @@ class TmdbService():
 
     def get_movie_images_endpoint(self, movie_id):
         endpoint = f"{self.get_movies_endpoint}{movie_id}/images"
-        with open("api_token.txt", "r") as tokenfile:
-            api_token = tokenfile.read()
-        headers = {
-            "Authorization": f"Bearer {api_token}"
-        }
+        headers = self._make_headers()
         response = requests.get(endpoint, headers=headers)
         return response.json()
 
@@ -73,11 +64,7 @@ class TmdbService():
 
     def get_movie_search_endpoint(self, query):
         endpoint = f"{self.endpoint_search}?query={query}"
-        with open("api_token.txt", "r") as tokenfile:
-            api_token = tokenfile.read()
-        headers = {
-            "Authorization": f"Bearer {api_token}"
-        }
+        headers = self._make_headers()
         response = requests.get(endpoint, headers=headers)
         return response.json()
 
@@ -86,11 +73,7 @@ class TmdbService():
 
     def get_airing_today(self):
         endpoint = f"{self.endpoint_get_tv_airing_today}"
-        with open("api_token.txt", "r") as tokenfile:
-            api_token = tokenfile.read()
-        headers = {
-            "Authorization": f"Bearer {api_token}"
-        }
+        headers = self._make_headers()
         response = requests.get(endpoint, headers=headers)
         return response.json()
 

@@ -29,18 +29,16 @@ def utility_processor():
 
 @app.route("/movie/<movie_id>")
 def movie_details(movie_id):
-    return render_template("movie_details.html",
-                           movie=tmdb_client.get_single_movie_endpoint(
-                               movie_id),
-                           cast=tmdb_client.get_cast_endpoint(
-                               movie_id, how_many=16),
-                           backdrop=tmdb_client.get_random_backdrop_endpoint(movie_id))
+    movie = tmdb_client.get_single_movie_endpoint(movie_id)
+    cast = tmdb_client.get_cast_endpoint(movie_id, how_many=16)
+    backdrop = tmdb_client.get_random_backdrop_endpoint(movie_id)
+    return render_template("movie_details.html", movie=movie, cast=cast, backdrop=backdrop)
 
 
 @app.route("/search")
 def search_movie():
-    query = request.args.get('q', "")
-    if query == "":
+    query = request.args.get('q')
+    if not query:
         return redirect(url_for("homepage"))
     movie_list = tmdb_client.search_movie(query)
     return render_template("search.html", search_query=query, movies=movie_list)
