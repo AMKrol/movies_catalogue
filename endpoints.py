@@ -52,13 +52,13 @@ class TmdbService():
         return random_data
 
     def get_movie_images_endpoint(self, movie_id):
-        endpoint = f"{self.get_movies_endpoint}{movie_id}/images"
+        endpoint = f"{self.endpoint}movie/{movie_id}/images"
         headers = self._make_headers()
         response = requests.get(endpoint, headers=headers)
         return response.json()
 
     def get_random_backdrop_endpoint(self, movie_id):
-        movie_images = self.get_movie_images(movie_id)
+        movie_images = self.get_movie_images_endpoint(movie_id)
         return random.choice(movie_images['backdrops'])["file_path"]
 
     def get_movie_search_endpoint(self, query):
