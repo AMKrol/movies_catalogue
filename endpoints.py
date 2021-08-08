@@ -4,31 +4,36 @@ import random
 
 class TmdbService():
     def __init__(self):
-        self.endpoint_movie = "https://api.themoviedb.org/3/movie/"
+        self.endpoint = "https://api.themoviedb.org/3/"
         self.endpoint_poster = "http://image.tmdb.org/t/p/"
         self.endpoint_search = "https://api.themoviedb.org/3/search/movie/"
         self.endpoint_get_tv_airing_today = "https://api.themoviedb.org/3/tv/airing_today"
         self.list_types = ['popular', 'top_rated', 'upcoming', 'now_playing']
 
-    def _make_headers():
+    def _make_headers(self):
         with open("api_token.txt", "r") as tokenfile:
             api_token = tokenfile.read()
         return {
             "Authorization": f"Bearer {api_token}"
         }
 
-    def get_movies_list_endpoint(self, list_name):
-        endpoint = f"{self.endpoint_movie}{list_name}"
+    def call_tmdb_api(self, endpoint):
+        endpoint = f"{self.endpoint}{endpoint}"
         headers = self._make_headers()
         response = requests.get(endpoint, headers=headers)
         response.raise_for_status()
         return response.json()
 
+
+    def get_movies_list_endpoint(self, list_name):
+        return self.call_tmdb_api(f"movie/{list_name}")
+
     def get_movies_endpoint(self, list_name="popular", how_many=12):
         if list_name not in self.list_types:
             list_name = "popular"
         data = self.get_movies_list_endpoint(list_name)
-        random_data = data["results"][:how_many]
+        random_data = data["results"]
+        random_data = random_data[:how_many]
         random.shuffle(random_data)
         return random_data
 
@@ -36,16 +41,10 @@ class TmdbService():
         return f"{self.endpoint_poster}{size}/{poster_path}"
 
     def get_single_movie_endpoint(self, movie_id):
-        endpoint = f"{self.endpoint_movie}{movie_id}"
-        headers = self._make_headers()
-        response = requests.get(endpoint, headers=headers)
-        return response.json()
+        return self.call_tmdb_api(f"movie/{movie_id}")
 
     def get_single_movie_cast_endpoint(self, movie_id):
-        endpoint = f"{self.endpoint_movie}{movie_id}/credits"
-        headers = self._make_headers()
-        response = requests.get(endpoint, headers=headers)
-        return response.json()
+        return self.call_tmdb_api(f"movie/{movie_id}/credits")
 
     def get_cast_endpoint(self, movie_id, how_many):
         data = self.get_single_movie_cast_endpoint(movie_id)
