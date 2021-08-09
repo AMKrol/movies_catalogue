@@ -1,5 +1,6 @@
 import requests
 import random
+import os
 
 
 class TmdbService():
@@ -9,12 +10,11 @@ class TmdbService():
         self.endpoint_search = "https://api.themoviedb.org/3/search/movie/"
         self.endpoint_get_tv_airing_today = "https://api.themoviedb.org/3/tv/airing_today"
         self.list_types = ['popular', 'top_rated', 'upcoming', 'now_playing']
+        self.API_TOKEN = os.environ.get("TMDB_API_TOKEN", "")
 
     def _make_headers(self):
-        with open("api_token.txt", "r") as tokenfile:
-            api_token = tokenfile.read()
         return {
-            "Authorization": f"Bearer {api_token}"
+            "Authorization": f"Bearer {self.API_TOKEN}"
         }
 
     def call_tmdb_api(self, endpoint):
@@ -23,7 +23,6 @@ class TmdbService():
         response = requests.get(endpoint, headers=headers)
         response.raise_for_status()
         return response.json()
-
 
     def get_movies_list_endpoint(self, list_name):
         return self.call_tmdb_api(f"movie/{list_name}")
