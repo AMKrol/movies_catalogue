@@ -5,3 +5,4 @@ Flask-WTF
 requests
 WTForms
 pytest
+gunicorn
