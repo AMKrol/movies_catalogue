@@ -1,8 +1,7 @@
-autopep8
-flake8
 Flask
 Flask-WTF
-requests
+flask-migrate
+flask-sqlalchemy
 WTForms
 pytest
 gunicorn

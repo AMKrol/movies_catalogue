@@ -1,13 +1,36 @@
-from flask import Flask, render_template, request, flash
-from flask import redirect, url_for
-from endpoints import TmdbService
-
-app = Flask(__name__)
-app.secret_key = b'_5#y2L"asdasdfnJHsd^546\n\xec]/'
+from catalogue.forms import LoginForm
+from flask import render_template, request, flash, url_for, redirect, session
+from catalogue import app
+from catalogue.models import FavMovies, db
+from catalogue.forms import EntryForm
+import functools
+import babel
+from catalogue.endpoints import TmdbService
 
 tmdb_client = TmdbService()
 
 FAVORITES = set()
+
+def login_required(view_func):
+    @functools.wraps(view_func)
+    def check_permissions(*args, **kwargs):
+        if session.get('logged_in'):
+            return view_func(*args, **kwargs)
+        return redirect(url_for('login', next=request.path))
+    return check_permissions
+
+
+@app.template_filter()
+def format_datetime(value):
+    format = "dd.MM.y"
+    return babel.dates.format_datetime(value, format)
+
+
+@app.context_processor
+def utility_processor():
+    def tmdb_image_url(path, size):
+        return tmdb_client.get_poster_url_endpoint(path, size)
+    return {"tmdb_image_url": tmdb_image_url}
 
 
 @app.route('/')
@@ -18,14 +41,6 @@ def homepage():
                            movies=movies,
                            list_type=list_type,
                            list_types=tmdb_client.list_types)
-
-
-@app.context_processor
-def utility_processor():
-    def tmdb_image_url(path, size):
-        return tmdb_client.get_poster_url_endpoint(path, size)
-    return {"tmdb_image_url": tmdb_image_url}
-
 
 @app.route("/movie/<movie_id>")
 def movie_details(movie_id):
@@ -51,6 +66,7 @@ def airing_today():
 
 
 @app.route("/favorites/add", methods=['POST'])
+@login_required
 def add_to_favorites():
     data = request.form
     movie_id = data.get('movie_id')
@@ -66,7 +82,3 @@ def add_to_favorites():
 def show_favorites():
     movie_list = tmdb_client.favories_list(FAVORITES)
     return render_template("favorites.html", movies=movie_list)
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
