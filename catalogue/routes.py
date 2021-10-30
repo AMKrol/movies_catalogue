@@ -40,7 +40,8 @@ def homepage():
     return render_template("homepage.html",
                            movies=movies,
                            list_type=list_type,
-                           list_types=tmdb_client.list_types)
+                           list_types=tmdb_client.list_types,
+                           session = session)
 
 @app.route("/movie/<movie_id>")
 def movie_details(movie_id):
@@ -79,6 +80,31 @@ def add_to_favorites():
 
 
 @app.route("/favorites")
+@login_required
 def show_favorites():
     movie_list = tmdb_client.favories_list(FAVORITES)
     return render_template("favorites.html", movies=movie_list)
+
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    errors = None
+    next_url = request.args.get('next')
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            session['logged_in'] = True
+            session['username'] = "testest"
+            session.permanent = True  # Use cookie to store session.
+            flash('You are now logged in.', 'success')
+            return redirect(next_url or url_for('homepage'))
+        else:
+            errors = form.errors
+    return render_template("login_form.html", form=form, errors=errors)
+
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    if request.method == 'POST':
+        session.clear()
+        flash('You are now logged out.', 'success')
+    return redirect(url_for('homepage'))
