@@ -1,15 +1,16 @@
 from catalogue.forms import LoginForm
 from flask import render_template, request, flash, url_for, redirect, session
 from catalogue import app
-from catalogue.models import FavMovies, db
-from catalogue.forms import EntryForm
+from catalogue.models import FavMovies, Users, db
 import functools
 import babel
 from catalogue.endpoints import TmdbService
+from wtforms import ValidationError
 
 tmdb_client = TmdbService()
 
 FAVORITES = set()
+
 
 def login_required(view_func):
     @functools.wraps(view_func)
@@ -41,7 +42,8 @@ def homepage():
                            movies=movies,
                            list_type=list_type,
                            list_types=tmdb_client.list_types,
-                           session = session)
+                           session=session)
+
 
 @app.route("/movie/<movie_id>")
 def movie_details(movie_id):
@@ -93,14 +95,23 @@ def login():
     next_url = request.args.get('next')
     if request.method == 'POST':
         if form.validate_on_submit():
-            session['logged_in'] = True
-            session['username'] = "testest"
-            session.permanent = True  # Use cookie to store session.
-            flash('You are now logged in.', 'success')
-            return redirect(next_url or url_for('homepage'))
+            user = Users.query.filter_by(username=form.username.data).first()
+            if user and user.password == form.password.data:
+                session['logged_in'] = True
+                session['username'] = "testest"
+                session.permanent = True  # Use cookie to store session.
+                flash('You are now logged in.', 'success')
+                return redirect(next_url or url_for('homepage'))
+            else:
+                errors = ValidationError("Bad username or password")
+                flash('Bad username or password', 'danger')
         else:
-            errors = form.errors
+            errors = ValidationError("Bad username or password")
+            flash('Bad username or password', 'danger')
+
+    print(errors)
     return render_template("login_form.html", form=form, errors=errors)
+
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
