@@ -51,17 +51,26 @@
                         class="form-control form-control-dark" placeholder="Search..." aria-label="Search" name="q">
                 </form>
 
+
+                {% if session.logged_in %}
                 <div class="text-end">
-                    {% if session.logged_in %}
                     <form action="{{ url_for('logout') }}" method="post">
-                        <button type="submit" class="btn btn-warning">Logout</button>
+                        <button type="submit" class="btn btn-outline-light me-2">Logout</button>
                     </form>
-                    {% else %}
+                </div>
+                {% else %}
+                <div class="text-end">
                     <form action="{{ url_for('login') }}">
                         <button type="submit" class="btn btn-outline-light me-2">Login</button>
                     </form>
-                    {% endif %}
                 </div>
+                <div class="text-end">
+                    <form action="{{ url_for('registerUser') }}">
+                        <button type="submit" class="btn btn-warning">Register</button>
+                    </form>
+                </div>
+                {% endif %}
+
             </div>
         </div>
     </header>

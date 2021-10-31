@@ -1,4 +1,4 @@
-from catalogue.forms import LoginForm
+from catalogue.forms import LoginForm, SignupForm
 from flask import render_template, request, flash, url_for, redirect, session
 from catalogue import app
 from catalogue.models import FavMovies, Users, db
@@ -119,3 +119,27 @@ def logout():
         session.clear()
         flash('You are now logged out.', 'success')
     return redirect(url_for('homepage'))
+
+@app.route("/register", methods=["GET", "POST"])
+def registerUser():
+    form = SignupForm()
+    errors = None
+    next_url = request.args.get('next')
+    if request.method == "POST":
+        if form.validate_on_submit():
+            user = Users.query.filter_by(username=form.username.data).first()
+            if user:
+                errors = ValidationError("Username already exists")
+                flash("User already exists", 'denger')
+            else:
+                newuser = Users(
+                    username=form.username.data,
+                    password=form.password.data
+                )
+                db.session.add(newuser)
+                db.session.commit()
+                return redirect(next_url or url_for('homepage'))
+        else:
+            errors = ValidationError("Password not match")
+            flash('Password not match', 'danger')
+    return render_template("register_form.html", form=form, errors=errors)
