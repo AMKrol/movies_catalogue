@@ -36,6 +36,15 @@ def utility_processor():
 def homepage():
     list_type = request.args.get('list_type', "popular")
     movies = tmdb_client.get_movies_endpoint(how_many=8, list_name=list_type)
+    if session['logged_in']:
+        db_movies = FavMovies.query.filter_by(username=session['ID']).all()
+        movies_id_list = [x.movieID for x in db_movies]
+        for m in movies:
+            if m['id'] in movies_id_list:
+                m['fav'] = True
+            else:
+                m['fav'] = False
+
     return render_template("homepage.html",
                            movies=movies,
                            list_type=list_type,
