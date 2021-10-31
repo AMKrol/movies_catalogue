@@ -9,8 +9,6 @@ from wtforms import ValidationError
 
 tmdb_client = TmdbService()
 
-FAVORITES = set()
-
 
 def login_required(view_func):
     @functools.wraps(view_func)
@@ -75,8 +73,12 @@ def add_to_favorites():
     movie_id = data.get('movie_id')
     movie_title = data.get('movie_title')
     if movie_id:
-        FAVORITES.add(movie_id)
-    flash(f"Film {movie_title} dodany do Ulubionych")
+        favmovie = FavMovies(movieID=movie_id,
+                             username=session['ID']
+                             )
+        db.session.add(favmovie)
+        db.session.commit()
+        flash(f"Film {movie_title} dodany do Ulubionych")
 
     return redirect(url_for('homepage'))
 
@@ -84,6 +86,8 @@ def add_to_favorites():
 @app.route("/favorites")
 @login_required
 def show_favorites():
+    movieslist = FavMovies.query.filter_by(username=session['ID']).all()
+    FAVORITES = [x.movieID for x in movieslist]
     movie_list = tmdb_client.favories_list(FAVORITES)
     return render_template("favorites.html", movies=movie_list)
 
@@ -98,7 +102,7 @@ def login():
             user = Users.query.filter_by(username=form.username.data).first()
             if user and user.password == form.password.data:
                 session['logged_in'] = True
-                session['username'] = "testest"
+                session['ID'] = user.id
                 session.permanent = True  # Use cookie to store session.
                 flash('You are now logged in.', 'success')
                 return redirect(next_url or url_for('homepage'))
@@ -119,6 +123,7 @@ def logout():
         session.clear()
         flash('You are now logged out.', 'success')
     return redirect(url_for('homepage'))
+
 
 @app.route("/register", methods=["GET", "POST"])
 def registerUser():
