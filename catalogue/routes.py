@@ -73,12 +73,14 @@ def add_to_favorites():
     movie_id = data.get('movie_id')
     movie_title = data.get('movie_title')
     if movie_id:
-        favmovie = FavMovies(movieID=movie_id,
+        movie = FavMovies.query.filter_by(movieID=movie_id, username=session['ID']).first()
+        if not movie:
+            favmovie = FavMovies(movieID=movie_id,
                              username=session['ID']
                              )
-        db.session.add(favmovie)
-        db.session.commit()
-        flash(f"Film {movie_title} dodany do Ulubionych")
+            db.session.add(favmovie)
+            db.session.commit()
+            flash(f"Film {movie_title} dodany do Ulubionych")
 
     return redirect(url_for('homepage'))
 
