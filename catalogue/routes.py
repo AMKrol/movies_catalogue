@@ -102,6 +102,17 @@ def show_favorites():
     movie_list = tmdb_client.favories_list(FAVORITES)
     return render_template("favorites.html", movies=movie_list)
 
+@app.route("/removefav", methods=['POST'])
+@login_required
+def remove_from_favorites():
+    data = request.form
+    movie_id = data.get('movie_id')
+    movie = FavMovies.query.filter_by(movieID=movie_id, username=session['ID']).first()
+    
+    db.session.delete(movie)
+    db.session.commit()
+
+    return redirect(url_for('show_favorites'))
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
